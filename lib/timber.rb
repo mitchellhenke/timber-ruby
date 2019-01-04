@@ -1,8 +1,9 @@
 # Base (must come first, order matters)
 require "timber/version"
-require "timber/overrides"
 require "timber/config"
 require "timber/util"
+
+# Load frameworks
 
 # Other (sorted alphabetically)
 require "timber/contexts"
@@ -11,11 +12,7 @@ require "timber/events"
 require "timber/log_devices"
 require "timber/log_entry"
 require "timber/logger"
-require "timber/integrations"
 require "timber/timer"
-
-# Load frameworks
-require "timber/frameworks"
 
 module Timber
   # Access the main configuration object. Please see {{Timber::Config}} for more details.
