@@ -126,12 +126,6 @@ module Timber
       end
     end
 
-    # These are rails modules that change the logger behavior. We have to
-    # include these if they are present or the logger will not function properly
-    # in a rails environment.
-    include ::ActiveSupport::LoggerThreadSafeLevel if defined?(::ActiveSupport::LoggerThreadSafeLevel)
-    include ::LoggerSilence if defined?(::LoggerSilence)
-
     # Creates a new Timber::Logger instance where the passed argument is an IO device. That is,
     # anything that responds to `#write` and `#close`.
     #
