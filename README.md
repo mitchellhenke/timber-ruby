@@ -12,7 +12,7 @@ making them [easier to search, use, and read](#get-things-done-with-your-logs). 
 [Timber console](#the-timber-console) to deliver a tailored Ruby logging experience designed to make
 you more productive.
 
-1. [**Installation** - One command: `bundle exec timber install`](#installation)
+1. [**Installation**](#installation)
 2. [**Usage** - Simple & powerful API](#usage)
 3. [**Integrations** - Automatic context and metadata for your existing logs](#integrations)
 4. [**The Timber Console** - Designed for applications & developers](#the-timber-console)
@@ -21,18 +21,11 @@ you more productive.
 
 ## Installation
 
-1. In your `Gemfile`, add the `timber` gem:
+In your `Gemfile`, add the `timber` gem:
 
     ```ruby
-    gem 'timber', '~> 2.3'
+    gem 'timber', '~> 3.0'
     ```
-
-2. In your `shell`, run:
-
-    ```
-    bundle install && bundle exec timber install
-    ```
-
 
 ## Usage
 
@@ -120,139 +113,6 @@ logger.info("Credit card charged", credit_card_charge: {amount: 123.23})
 ...[read more in our docs](https://timber.io/docs/languages/ruby/usage/metrics-and-timings)
 
 </p></details>
-
-
-## Configuration
-
-Below are a few popular configuration options, for a comprehensive list, see
-[Timber::Config](http://www.rubydoc.info/github/timberio/timber-ruby/Timber/Config).
-
-<details><summary><strong>Logrageify. Silence noisy logs.</strong></summary><p>
-
-Silence noisy logs that aren't of value to you, just like
-[lograge](https://github.com/roidrage/lograge):
-
-```ruby
-# config/initializers/timber.rb
-Timber.config.logrageify!()
-```
-
-It turns this:
-
-```
-Started GET "/" for 127.0.0.1 at 2012-03-10 14:28:14 +0100
-Processing by HomeController#index as HTML
-  Rendered text template within layouts/application (0.0ms)
-  Rendered layouts/_assets.html.erb (2.0ms)
-  Rendered layouts/_top.html.erb (2.6ms)
-  Rendered layouts/_about.html.erb (0.3ms)
-  Rendered layouts/_google_analytics.html.erb (0.4ms)
-Completed 200 OK in 79ms (Views: 78.8ms | ActiveRecord: 0.0ms)
-```
-
-Into this:
-
-```
-Get "/" sent 200 OK in 79ms
-```
-
-### Pro-tip: Keep controller call logs (recommended)
-
-Feel free to deviate and customize which logs you silence. We recommend a slight deviation
-from lograge with the following settings:
-
-```ruby
-# config/initializers/timber.rb
-
-Timber.config.integrations.action_view.silence = true
-Timber.config.integrations.active_record.silence = true
-Timber.config.integrations.rack.http_events.collapse_into_single_event = true
-```
-
-This does _not_ silence the controller call log event. This is because Timber captures the
-parameters passed to the controller, which are generally valuable when debugging.
-
-For a full list of integration settings, see
-[Timber::Config::Integrations](http://www.rubydoc.info/github/timberio/timber-ruby/Timber/Config/Integrations)
-
----
-
-</p></details>
-
-<details><summary><strong>Silence specific requests (LB health checks, etc)</strong></summary><p>
-
-Silencing noisy requests can be helpful for silencing load balance health checks, bot scanning,
-or activity that generally is not meaningful to you. The following will silence all
-`[GET] /_health` requests:
-
-```ruby
-# config/initializers/timber.rb
-
-Timber.config.integrations.rack.http_events.silence_request = lambda do |rack_env, rack_request|
-  rack_request.path == "/_health"
-end
-```
-
-We require a block because it gives you complete control over how you want to silence requests.
-The first parameter being the traditional Rack env hash, the second being a
-[Rack Request](http://www.rubydoc.info/gems/rack/Rack/Request) object.
-
----
-
-</p></details>
-
-<details><summary><strong>Capture custom user context</strong></summary><p>
-
-By default Timber automatically captures user context for most of the popular authentication
-libraries (Devise, and Clearance). See
-[Timber::Integrations::Rack::UserContext](http://www.rubydoc.info/github/timberio/timber-ruby/Timber/Integrations/Rack/UserContext)
-for a complete list.
-
-In cases where you Timber doesn't support your strategy, or you want to customize it further,
-you can do so like:
-
-```ruby
-# config/initializers/timber.rb
-
-Timber.config.integrations.rack.user_context.custom_user_hash = lambda do |rack_env|
-  user = rack_env['warden'].user
-  if user
-    {
-      id: user.id, # unique identifier for the user, can be an integer or string,
-      name: user.name, # identifiable name for the user,
-      email: user.email, # user's email address
-    }
-  else
-    nil
-  end
-end
-```
-
-*All* of the user hash keys are optional, but you must provide at least one.
-
----
-
-</p></details>
-
-<details><summary><strong>Capture release / deploy context</strong></summary><p>
-
-[Timber::Contexts::Release](http://www.rubydoc.info/github/timberio/timber-ruby/Timber/Contexts/Release)
-tracks the current application release and version.
-
-If you're on Heroku, simply enable the
-[dyno metadata](https://devcenter.heroku.com/articles/dyno-metadata) feature. If you are not,
-set the following environment variables and this context will be added automatically:
-
-1. `RELEASE_COMMIT` - Ex: `2c3a0b24069af49b3de35b8e8c26765c1dba9ff0`
-2. `RELEASE_CREATED_AT` - Ex: `2015-04-02T18:00:42Z`
-3. `RELEASE_VERSION` - Ex: `v2.3.1`
-
-All variables are optional, but at least one must be present.
-
----
-
-</p></details>
-
 
 ## Integrations
 
