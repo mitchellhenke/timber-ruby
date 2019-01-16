@@ -23,9 +23,9 @@ you more productive.
 
 In your `Gemfile`, add the `timber` gem:
 
-    ```ruby
-    gem 'timber', '~> 3.0'
-    ```
+```ruby
+gem 'timber', '~> 3.0'
+```
 
 ## Usage
 
