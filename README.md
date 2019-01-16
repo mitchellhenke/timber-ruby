@@ -29,8 +29,6 @@ gem 'timber', '~> 3.0'
 
 ## Usage
 
-<details><summary><strong>Basic logging</strong></summary><p>
-
 Use the `Timber::Logger` just like you would `::Logger`:
 
 ```ruby
@@ -41,35 +39,14 @@ logger.error("Error message")
 logger.fatal("Fatal message")
 ```
 
-* [Search it](https://timber.io/docs/app/console/searching) with queries like: `error message`
-* [Alert on it](https://timber.io/docs/app/console/alerts) with threshold based alerts
-* [View this event's metadata and context](https://timber.io/docs/app/console/view-metadata-and-context)
-
-[...read more in our docs](https://timber.io/docs/languages/ruby/usage/basic-logging)
-
 ---
-
-</p></details>
-
-<details><summary><strong>Logging events (structured data)</strong></summary><p>
 
 Log structured data without sacrificing readability:
 
 ```ruby
 logger.warn "Payment rejected", payment_rejected: {customer_id: "abcd1234", amount: 100, reason: "Card expired"}
 ```
-
-* [Search it](https://timber.io/docs/app/console/searching) with queries like: `type:payment_rejected` or `payment_rejected.amount:>100`
-* [Alert on it](https://timber.io/docs/app/console/alerts) with threshold based alerts
-* [View this event's data and context](https://timber.io/docs/app/console/view-metadata-and-context)
-
-...[read more in our docs](https://timber.io/docs/languages/ruby/usage/custom-events)
-
 ---
-
-</p></details>
-
-<details><summary><strong>Setting context</strong></summary><p>
 
 Add shared structured data across your logs:
 
@@ -81,16 +58,7 @@ Timber.with_context(job: {id: 123}) do
 end
 ```
 
-* [Search it](https://timber.io/docs/app/console/searching) with queries like: `job.id:123`
-* [View this context when viewing a log's metadata](https://timber.io/docs/app/console/view-metadata-and-context)
-
-...[read more in our docs](https://timber.io/docs/languages/ruby/usage/custom-context)
-
 ---
-
-</p></details>
-
-<details><summary><strong>Metrics, Timings, & Tracing</strong></summary><p>
 
 Time code blocks:
 
@@ -105,14 +73,6 @@ Log generic metrics:
 ```ruby
 logger.info("Credit card charged", credit_card_charge: {amount: 123.23})
 ```
-
-* [Search it](https://timber.io/docs/app/console/searching) with queries like: `background_job.time_ms:>500`
-* [Alert on it](https://timber.io/docs/app/console/alerts) with threshold based alerts
-* [View this log's metadata in the console](https://timber.io/docs/app/console/view-metadata-and-context)
-
-...[read more in our docs](https://timber.io/docs/languages/ruby/usage/metrics-and-timings)
-
-</p></details>
 
 ## Integrations
 
@@ -133,6 +93,12 @@ support:
 
 ...more coming soon! Make a request by [opening an issue](https://github.com/timberio/timber-ruby/issues/new)
 
+## The Timber Console
+
+[![Timber Console](http://files.timber.io/images/readme-interface7.gif)](https://timber.io/docs/app)
+
+[Learn more about our app.](https://timber.io/docs/app)
+
 
 ## Get things done with your logs
 
@@ -144,13 +110,6 @@ Logging features designed to help developers get more done:
 4. [**Inspect HTTP request parameters.** - Quickly reproduce issues.](https://timber.io/docs/app/console/inspect-http-requests)
 5. [**Threshold based alerting.** - Know when things break.](https://timber.io/docs/app/alerts)
 6. ...and more! Checkout our [the Timber application docs](https://timber.io/docs/app)
-
-
-## The Timber Console
-
-[![Timber Console](http://files.timber.io/images/readme-interface7.gif)](https://timber.io/docs/app)
-
-[Learn more about our app.](https://timber.io/docs/app)
 
 ## Your Moment of Zen
 
