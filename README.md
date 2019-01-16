@@ -39,14 +39,11 @@ logger.error("Error message")
 logger.fatal("Fatal message")
 ```
 
----
-
-Log structured data without sacrificing readability:
+### Structured Data
 
 ```ruby
 logger.warn "Payment rejected", payment_rejected: {customer_id: "abcd1234", amount: 100, reason: "Card expired"}
 ```
----
 
 Add shared structured data across your logs:
 
@@ -58,9 +55,7 @@ Timber.with_context(job: {id: 123}) do
 end
 ```
 
----
-
-Time code blocks:
+### Time Code Blocks
 
 ```ruby
 timer = Timber.start_timer
@@ -68,7 +63,7 @@ timer = Timber.start_timer
 logger.info("Processed background job", background_job: {time_ms: timer})
 ```
 
-Log generic metrics:
+### Metrics
 
 ```ruby
 logger.info("Credit card charged", credit_card_charge: {amount: 123.23})
