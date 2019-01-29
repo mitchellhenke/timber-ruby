@@ -25,7 +25,6 @@ module Timber
       end
     end
 
-    DEFAULT_HTTP_BODY_LIMIT = 2048.freeze
     DEVELOPMENT_NAME = "development".freeze
     PRODUCTION_NAME = "production".freeze
     STAGING_NAME = "staging".freeze
@@ -34,11 +33,6 @@ module Timber
     include Singleton
 
     attr_writer :http_body_limit
-
-    # @private
-    def initialize
-      @http_body_limit = DEFAULT_HTTP_BODY_LIMIT
-    end
 
     # Convenience method for logging debug statements to the debug logger
     # set in this class.
@@ -110,46 +104,6 @@ module Timber
     # Accessor method for {#environment=}
     def environment
       @environment ||= ENV["RACK_ENV"] || ENV["RAILS_ENV"] || "development"
-    end
-
-    # This is a list of header keys that should be filtered. Note, all headers are
-    # normalized to down-case. So please _only_ pass down-cased headers.
-    #
-    # @example Rails
-    #   # config/environments/production.rb
-    #   config.timber.header_filter_headers += ['api-key']
-    def http_header_filters=(value)
-      @http_header_filters = value
-    end
-
-    # Accessor method for {#http_header_filters=}
-    def http_header_filters
-      @http_header_filters ||= []
-    end
-
-    # Truncates captured HTTP bodies to this specified limit. The default is `2048`.
-    # If you want to capture more data, you can raise this to a maximum of `8192`,
-    # or lower this to be more efficient with data. `2048` characters should give you a good
-    # idea of the body content.
-    #
-    # @example Rails
-    #   config.timber.http_body_limit = 2048
-    # @example Everything else
-    #   Timber::Config.instance.http_body_limit = 2048
-    def http_body_limit=(value)
-      @http_body_limit = value
-    end
-
-    # Accessor method for {#http_body_limit=}
-    def http_body_limit
-      @http_body_limit
-    end
-
-    # Convenience method for accessing the various `Timber::Integrations::*` class
-    # settings. These provides settings for enabling, disabled, and silencing integrations.
-    # See {Integrations} for a full list of available methods.
-    def integrations
-      Integrations
     end
 
     # This is the _main_ logger Timber writes to. All of the Timber integrations write to
