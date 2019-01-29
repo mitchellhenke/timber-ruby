@@ -1,113 +1,144 @@
-# 🌲 Timber - Great Ruby Logging Made Easy
+# 🌲 Timber - Beautiful, Fast, Powerful Ruby Logging
 
 [![ISC License](https://img.shields.io/badge/license-ISC-ff69b4.svg)](LICENSE.md)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://www.rubydoc.info/github/timberio/timber-ruby)
 [![Build Status](https://travis-ci.org/timberio/timber-ruby.svg?branch=master)](https://travis-ci.org/timberio/timber-ruby)
 [![Code Climate](https://codeclimate.com/github/timberio/timber-ruby/badges/gpa.svg)](https://codeclimate.com/github/timberio/timber-ruby)
 
-Timber for Ruby is a drop in replacement for your Ruby logger that
-[unobtrusively augments](https://timber.io/docs/concepts/structuring-through-augmentation) your
-logs with [rich metadata and context](https://timber.io/docs/concepts/metadata-context-and-events)
-making them [easier to search, use, and read](#get-things-done-with-your-logs). It pairs with the
-[Timber console](#the-timber-console) to deliver a tailored Ruby logging experience designed to make
-you more productive.
+[Timber.io][timber] is a hosted service for aggregating logs across your entire stack -
+any language, any platform, any data source.
 
-1. [**Installation**](#installation)
-2. [**Usage** - Simple & powerful API](#usage)
-3. [**Integrations** - Automatic context and metadata for your existing logs](#integrations)
-4. [**The Timber Console** - Designed for applications & developers](#the-timber-console)
-5. [**Get things done with your logs 💪**](#get-things-done-with-your-logs)
+Unlike traditional logging tools, Timber integrates with language runtimes to automatically
+capture in-app context and metadata, turning your text-based logs into rich structured events.
+Timber integrates with Ruby through this library. And Timber's free-form query tools, real-time
+tailing, and graphing make using your logs easier than ever.
 
+The result: Beautiful, fast, powerful Ruby logging.
 
-## Installation
+* [Getting started](#getting-started)
+* [Usage](#usage)
+* [Integrations](#integrations)
+* [Performance & Reliability](#performance-reliability)
 
-In your `Gemfile`, add the `timber` gem:
+## Getting Started
+
+1. Grab your API key at [Timber.io][signup].
+
+2. In your `Gemfile`, add the `timber` gem:
+
+    ```ruby
+    gem 'timber', '~> 3.0'
+    ```
+
+3. In `config/environments/production.rb` add the `Timber::Logger` at the _bottom_:
+
+    ```ruby
+    # config/environments/production.rb`
+    config.logger = Timber::Logger.new('{{your-timber-api-key}}')
+    ```
+
+    **Be sure to remove any previous `config.logger = ` calls!**
+
+### Testing the pipes
+
+You can test the Timber integration locally if you'd like:
+
+```
+rails console
+```
+
+And then:
 
 ```ruby
-gem 'timber', '~> 3.0'
+logger = Timber::Logger.new('{{your-timber-api-key}}')
+logger.info("Testing the pipes")
 ```
+
+You will see this message appear in your [Timber console][timber_console]. If not, please
+[contact support][support], we are happy to assist with setup.
+
+### What about non-Rails applications?
+
+Step 3 above is Rails specific since that is the common case. You'll notice though, that
+using the Timber logger is as simple as instantiating a `Timber::Logger` object with your
+API key. Depending on your framework, you'll want to assign this object to a global variable
+similar to how `Rails.logger` is available globally. Many frameworks provide a means for setting
+global configuration and state.
 
 ## Usage
 
-Use the `Timber::Logger` just like you would `::Logger`:
+Timber works just like the [Ruby `Logger`][ruby_logger], making it dead simple to adopt:
 
 ```ruby
-logger.debug("Debug message")
-logger.info("Info message")
-logger.warn("Warn message")
-logger.error("Error message")
-logger.fatal("Fatal message")
-```
-
-### Structured Data
-
-```ruby
-logger.warn "Payment rejected", payment_rejected: {customer_id: "abcd1234", amount: 100, reason: "Card expired"}
-```
-
-Add shared structured data across your logs:
-
-```ruby
-Timber.with_context(job: {id: 123}) do
-  logger.info("Background job execution started")
-  # ... code here
-  logger.info("Background job execution completed")
+Timber.with_context(user: {id: "5c06a0df5f37972e07cb7213"}) do
+  Rails.logger.info("Order #1234 placed", order_placed: {id: 1234, total: 100.54})
 end
 ```
 
-### Time Code Blocks
+Produces the following event:
 
-```ruby
-timer = Timber.start_timer
-# ... code to time ...
-logger.info("Processed background job", background_job: {time_ms: timer})
+```json
+{
+  "dt": "2019-01-29T17:11:48.992670Z",
+  "level": "info",
+  "message": "Order #1234 placed",
+  "order_placed": {
+    "id": 1234,
+    "total": 100.54
+  },
+  "context": {
+    "user": {
+      "id": "5c06a0df5f37972e07cb7213"
+    },
+    "system": {
+      "pid": 20643,
+      "hostname": "ec2-44-125-241-8"
+    }
+  }
+}
 ```
 
-### Metrics
+Allowing you to run queries like:
 
-```ruby
-logger.info("Credit card charged", credit_card_charge: {amount: 123.23})
-```
+* Tail a user: `context.user.id:5c06a0df5f37972e07cb7213`
+* Find orders of a certain value: `order_placed.total:>=100`
+* View logs in the context of a single host: `context.system.hostname:"ec2-44-125-241-8"`
+
+See more usage examples in [our Ruby documentation][docs].
 
 ## Integrations
 
-Timber integrates with popular frameworks and libraries to capture context and metadata you
-couldn't otherwise. This automatically augments logs produced by these libraries, making them
-[easier to search and use](#do-amazing-things-with-your-logs). Below is a list of libraries we
-support:
+Extend Timber's context and metadata capture into 3rd party libraries:
 
-* Frameworks & Libraries
-   * [**Rails**](https://timber.io/docs/languages/ruby/integrations/rails)
-   * [**Rack**](https://timber.io/docs/languages/ruby/integrations/rack)
-   * [**Devise**](https://timber.io/docs/languages/ruby/integrations/devise)
-   * [**Clearance**](https://timber.io/docs/languages/ruby/integrations/clearnace)
-   * [**Warden**](https://timber.io/docs/languages/ruby/integrations/devise)
-* Platforms
-   * [**Heroku**](https://timber.io/docs/languages/ruby/integrations/heroku)
-   * [**System / Server**](https://timber.io/docs/languages/ruby/integrations/system)
+* [`Rack`](https://github.com/timberio/timber-ruby-rack) - Augment `Rack` logs with context and metadata.
+* [`Rails`](https://github.com/timberio/timber-ruby-rails) - Augment `Rails` logs with context and metadata.
 
-...more coming soon! Make a request by [opening an issue](https://github.com/timberio/timber-ruby/issues/new)
+## Performance & Reliability
 
-## The Timber Console
+Extreme care was taken into the design of Timber to be fast and reliable:
 
-[![Timber Console](http://files.timber.io/images/readme-interface7.gif)](https://timber.io/docs/app)
+1. Log data is buffered and flushed on an interval to optimize performance and delivery.
+2. Timber uses a [simple in-memory fixed sized queue][http_queue] to control memory usage and
+   ensure log volume fluctuations do not disrupt application performance in any way.
+3. The Timber HTTP backend uses a controlled [multi-buffer][multi_buffer] design to efficiently
+   ship data to the Timber service.
+4. Connections are re-used and rotated to ensure efficient and reliabile delivery of log data.
+5. Delivery failures are retried with an exponential backoff, maximizing successful delivery.
+6. [Msgpack][msgpack] is used for payload encoding for it's superior performance and memory
+   management.
+7. The Timber service ingest endpoint is HA servce designed to handle extreme fluctuations of
+   volume and responds in under 50ms.
 
-[Learn more about our app.](https://timber.io/docs/app)
+---
 
-
-## Get things done with your logs
-
-Logging features designed to help developers get more done:
-
-1. [**Powerful searching.** - Find what you need faster.](https://timber.io/docs/app/console/searching)
-2. [**Live tail users.** - Easily solve customer issues.](https://timber.io/docs/app/console/tail-a-user)
-3. [**View logs per HTTP request.** - See the full story without the noise.](https://timber.io/docs/app/console/trace-http-requests)
-4. [**Inspect HTTP request parameters.** - Quickly reproduce issues.](https://timber.io/docs/app/console/inspect-http-requests)
-5. [**Threshold based alerting.** - Know when things break.](https://timber.io/docs/app/alerts)
-6. ...and more! Checkout our [the Timber application docs](https://timber.io/docs/app)
-
-## Your Moment of Zen
-
-<p align="center" style="background: #221f40;">
-<a href="https://timber.io"><img src="http://files.timber.io/images/readme-log-truth.png" height="947" /></a>
+<p align="center">
+<a href="mailto:support@timber.io">Support</a> &bull;
+<a href="https://timber.io">Timber.io</a>
 </p>
+
+[docs]: https://docs.timber.io/languages/ruby
+[msgpack]: https://msgpack.org/index.html
+[multi_buffer]: https://en.wikipedia.org/wiki/Multiple_buffering
+[ruby_logger]: https://docs.ruby-lang.org/en/2.4.0/Logger.html
+[signup]: https://app.timber.io
+[timber]: https://timber.io
