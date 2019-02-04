@@ -1,8 +1,6 @@
 require "logger"
 require "singleton"
 
-require "timber/config/integrations"
-
 module Timber
   # Singleton class for reading and setting Timber configuration.
   #
