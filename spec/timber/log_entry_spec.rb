@@ -5,7 +5,14 @@ describe Timber::LogEntry, :rails_23 => true do
 
   describe "#to_msgpack" do
     it "should encode properly with an event and context" do
-      event = Timber::Events::Custom.new(type: :event_type, message: "event_message", data: {a: 1})
+      event = {
+        message: "event_message",
+        event: {
+          event_type: {
+            a: 1
+          }
+        }
+      }
       custom_context = Timber::Contexts::Custom.new(type: :context_type, data: {b: 1})
       context = {custom: custom_context.as_json}
       log_entry = described_class.new("INFO", time, nil, "log message", context, event)

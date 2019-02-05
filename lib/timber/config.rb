@@ -104,6 +104,13 @@ module Timber
       @environment ||= ENV["RACK_ENV"] || ENV["RAILS_ENV"] || "development"
     end
 
+    # Convenience method for accessing the various `Timber::Integrations::*` class
+    # settings. These provides settings for enabling, disabled, and silencing integrations.
+    # See {Integrations} for a full list of available methods.
+    def integrations
+      Integrations
+    end
+
     # This is the _main_ logger Timber writes to. All of the Timber integrations write to
     # this logger instance. It should be set to your global logger. For Rails, this is set
     # automatically to `Rails.logger`, you should not have to set this.

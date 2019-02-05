@@ -3,7 +3,6 @@ require "msgpack"
 
 require "timber/config"
 require "timber/current_context"
-require "timber/event"
 require "timber/log_devices"
 require "timber/log_entry"
 
@@ -37,21 +36,16 @@ module Timber
           level = SEVERITY_MAP.fetch(severity)
           tags = extract_active_support_tagged_logging_tags
 
-          if logged_obj.is_a?(Event)
-            LogEntry.new(level, time, progname, logged_obj.message, context_snapshot, logged_obj,
-              tags: tags)
-          elsif logged_obj.is_a?(Hash)
+          if logged_obj.is_a?(Hash)
             # Extract the tags
             tags = tags.clone
             tags.push(logged_obj.delete(:tag)) if logged_obj.key?(:tag)
             tags.concat(logged_obj.delete(:tags)) if logged_obj.key?(:tags)
             tags.uniq!
 
-            # Build the event
-            event = Events.build(logged_obj)
-            message = event ? event.message : logged_obj[:message]
+            message = logged_obj.delete(:message)
 
-            LogEntry.new(level, time, progname, message, context_snapshot, event, tags: tags)
+            LogEntry.new(level, time, progname, message, context_snapshot, logged_obj, tags: tags)
           else
             LogEntry.new(level, time, progname, logged_obj, context_snapshot, nil, tags: tags)
           end

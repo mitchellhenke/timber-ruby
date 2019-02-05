@@ -9,10 +9,13 @@ require "timber/util"
 require "timber/contexts"
 require "timber/current_context"
 require "timber/events"
+require "timber/integration"
 require "timber/log_devices"
 require "timber/log_entry"
 require "timber/logger"
 require "timber/timer"
+require "timber/integrator"
+require "timber/integration"
 
 module Timber
   # Access the main configuration object. Please see {{Timber::Config}} for more details.

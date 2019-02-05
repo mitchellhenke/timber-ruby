@@ -54,7 +54,7 @@ module Timber
       end
 
       if !event.nil?
-        hash[:event] = event.as_json
+        hash.merge!(event)
       end
 
       if !context_snapshot.nil? && context_snapshot.length > 0
@@ -94,13 +94,11 @@ module Timber
 
       if !event.nil?
         event_hash = event.as_json
-        event_type = event_hash.keys.first
-
-        event_type = if event.is_a?(Events::Custom)
-          "#{event_type}.#{event.type}"
-        else
-          "#{event_type}"
-        end
+        event_type = if event_hash && event_hash["event"]
+                       event_hash["event"].keys.first
+                     else
+                       event_hash.keys.first
+                     end
 
         log_message = "#{message} [#{event_type}]"
       end
