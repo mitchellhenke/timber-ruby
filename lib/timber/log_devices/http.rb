@@ -121,6 +121,25 @@ module Timber
         @request_outlet_thread.kill if @request_outlet_thread
       end
 
+      def deliver_one(msg)
+        http = build_http
+
+        begin
+          resp = http.start do |conn|
+            req = build_request([msg])
+            @requests_in_flight += 1
+            conn.request(req)
+          end
+          return resp
+        rescue => e
+          Timber::Config.instance.debug { "error: #{e.message}" }
+          return e
+        ensure
+          http.finish if http.started?
+          @requests_in_flight -= 1
+        end
+      end
+
       private
         # This is a convenience method to ensure the flush thread are
         # started. This is called lazily from {#write} so that we
@@ -139,10 +158,7 @@ module Timber
         end
 
         # Builds an HTTP request based on the current messages queued.
-        def build_request
-          msgs = @msg_queue.flush
-          return if msgs.empty?
-
+        def build_request(msgs)
           req = Net::HTTP::Post.new(@timber_url.path)
           req['Authorization'] = authorization_payload
           req['Content-Type'] = CONTENT_TYPE
@@ -159,7 +175,10 @@ module Timber
         # imposed limit.
         def flush_async
           @last_async_flush = Time.now
-          req = build_request
+          msgs = @msg_queue.flush
+          return if msgs.empty?
+
+          req = build_request(msgs)
           if !req.nil?
             Timber::Config.instance.debug { "New request placed on queue" }
             request_attempt = RequestAttempt.new(req)

@@ -1,3 +1,4 @@
+require 'timber/event'
 module Timber
   module Events
     # The SQL query event tracks sql queries to your database.
@@ -15,6 +16,19 @@ module Timber
         @message = normalizer.fetch!(:message, :string, :limit => MESSAGE_MAX_BYTES)
         @sql = normalizer.fetch!(:sql, :string, :limit => SQL_MAX_BYTES)
         @duration_ms = normalizer.fetch!(:duration_ms, :float, :precision => 6)
+      end
+
+      def to_hash
+        @to_hash ||= Util::NonNilHashBuilder.build do |h|
+          h.add(:sql, sql)
+          h.add(:time_ms, duration_ms)
+        end
+      end
+      alias to_h to_hash
+
+      # Builds a hash representation containing simple objects, suitable for serialization (JSON).
+      def as_json(_options = {})
+        {:sql_query => to_hash}
       end
     end
   end
