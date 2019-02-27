@@ -1,9 +1,10 @@
 require "timber/util"
+require "timber/event"
 
 module Timber
   module Events
     # The controller call event tracks controller invocations.
-    class ControllerCall
+    class ControllerCall < Timber::Event
       ACTION_MAX_BYTES = 256.freeze
       FORMAT_MAX_BYTES = 256.freeze
       CONTROLLER_MAX_BYTES = 256.freeze
@@ -30,6 +31,20 @@ module Timber
           message << "\n  Parameters: #{params.inspect}"
         end
         message
+      end
+
+      def metadata
+        hash = Util::NonNilHashBuilder.build do |h|
+          h.add(:controller, controller)
+          h.add(:action, action)
+          h.add(:params_json, params_json)
+        end
+
+        {
+          event: {
+            controller_called: hash
+          }
+        }
       end
     end
   end

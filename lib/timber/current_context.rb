@@ -171,7 +171,7 @@ module Timber
       def add_to!(hash, object)
         context = Contexts.build(object) # Normalizes objects into a Timber::Context descendant.
         key = context.keyspace
-        json = context.as_json # Convert to json now so that we aren't doing it for every line
+        json = context.to_hash # Convert to json now so that we aren't doing it for every line
         if key == :custom
           # Custom contexts are merged into the space
           hash[key] ||= {}

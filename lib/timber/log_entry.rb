@@ -41,7 +41,7 @@ module Timber
     end
 
     # Builds a hash representation containing simple objects, suitable for serialization (JSON).
-    def as_json(options = {})
+    def to_hash(options = {})
       options ||= {}
       hash = {
         :level => level,
@@ -81,11 +81,11 @@ module Timber
     end
 
     def to_json(options = {})
-      as_json(options).to_json
+      to_hash.to_json
     end
 
     def to_msgpack(*args)
-      as_json.to_msgpack(*args)
+      to_hash.to_msgpack(*args)
     end
 
     # This is used when LogEntry objects make it to a non-Timber logger.
@@ -93,9 +93,9 @@ module Timber
       log_message = message
 
       if !event.nil?
-        event_hash = event.as_json
-        event_type = if event_hash && event_hash["event"]
-                       event_hash["event"].keys.first
+        event_hash = event.to_hash
+        event_type = if event_hash && event_hash[:event]
+                       event_hash[:event].keys.first
                      else
                        event_hash.keys.first
                      end

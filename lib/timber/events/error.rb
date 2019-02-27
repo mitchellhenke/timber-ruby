@@ -1,4 +1,5 @@
 require "timber/util"
+require "timber/event"
 
 module Timber
   module Events
@@ -6,7 +7,7 @@ module Timber
     #
     # @note This event should be installed automatically through integrations,
     #   such as the {Integrations::ActionDispatch::DebugExceptions} integration.
-    class Error
+    class Error < Timber::Event
       BACKTRACE_JSON_MAX_BYTES = 8192.freeze
       MESSAGE_MAX_BYTES = 8192.freeze
 
@@ -27,6 +28,20 @@ module Timber
         end
 
         message
+      end
+
+      def metadata
+        hash = Util::NonNilHashBuilder.build do |h|
+          h.add(:name, name)
+          h.add(:message, error_message)
+          h.add(:backtrace_json, backtrace_json)
+        end
+
+        {
+          event: {
+            error: hash
+          }
+        }
       end
     end
   end
